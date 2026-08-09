@@ -64,6 +64,12 @@ interface CoverConfig {
   };
 
   /**
+   * 没有在 frontmatter 配置 cover 时使用的文章卡片图片 API。
+   * 构建时会为 URL 添加 post=<文章 ID>，避免多个卡片共用同一个浏览器缓存键。
+   */
+  postFallbackCover?: string;
+
+  /**
    * 启用高级轮播模式。
    * - true：使用 PR #36 的新行为（支持远程 URL、covers.config.ts、任意 ≥2 张图即可轮播）
    * - false（默认）：使用旧行为（仅本地图片、必须恰好 6 张才启动轮播）
