@@ -6,10 +6,12 @@ import FriendRules from "@/content/friends-rules.md";
 import WalineComments from "@/components/post/WalineComments.svelte";
 import { currentLocale } from "@/i18n";
 import themeConfig from "@/theme.config";
+import friendsData from "@/data/friends.json";
+import { parseFriendLinks } from "@/toolkit/friendsData";
 import astroConfig from "../../../astro.config.mjs";
 
 const friendsConfig = themeConfig.friends;
-const friendLinks = friendsConfig?.links ?? [];
+const friendLinks = parseFriendLinks(friendsData);
 const pageTitle = friendsConfig?.title ?? "友链";
 const pageDescription =
   friendsConfig?.description ?? "卡片式展示，支持站点预览与主题色点缀。";

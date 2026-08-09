@@ -25,7 +25,8 @@ const posts = defineCollection({
         z.array(z.string()).nullable().optional(),
       ),
       draft: z.boolean().optional(),
-      cover: image().optional(),
+      // 本地图片走 Astro 资源管线；旧文章的远程封面保留为严格 URL，避免重新分发。
+      cover: z.union([image(), z.url()]).optional(),
       sticky: z.boolean().optional(),
       license: z
         .enum([

@@ -1,0 +1,62 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Breadcrumb from "@/components/post/Breadcrumb.astro";
+import PostHeader from "@/components/post/PostHeader.astro";
+import SubscribeContent, {
+  frontmatter as subscribeFrontmatter,
+} from "@/content/subscribe.md";
+import { currentLocale } from "@/i18n";
+
+import "@/styles/post.css";
+
+interface SubscribeFrontmatter {
+  title?: string;
+  description?: string;
+  date?: string | Date;
+}
+
+const frontmatter = (subscribeFrontmatter ?? {}) as SubscribeFrontmatter;
+
+const parseDate = (value: string | Date | undefined) => {
+  if (value instanceof Date && !Number.isNaN(value.getTime())) {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed;
+    }
+  }
+
+  return new Date("2020-01-01T00:00:00Z");
+};
+
+const title = frontmatter.title || "订阅";
+const description = frontmatter.description || "通过 RSS 或 Email 订阅本站更新。";
+const publishDate = parseDate(frontmatter.date);
+---
+
+<Layout pageTitle={title}>
+  <Fragment slot="head">
+    <meta name="description" content={description} />
+  </Fragment>
+
+  <div class="article wrap">
+    <Breadcrumb isHome={false} />
+
+    <article
+      itemscope
+      itemtype="https://schema.org/WebPage"
+      class="post block"
+      data-pagefind-body
+      lang={currentLocale}
+    >
+      <PostHeader title={title} date={publishDate} />
+
+      <div class="body md" itemprop="mainContentOfPage">
+        <SubscribeContent />
+      </div>
+    </article>
+  </div>
+</Layout>

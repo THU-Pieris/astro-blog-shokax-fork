@@ -21,6 +21,7 @@ describe("url helpers", () => {
   it("builds post href with suffix trimming and encoding", () => {
     expect(toPostHref("notes/hello world.md")).toBe("/posts/notes/hello%20world/");
     expect(toPostHref("/nested/path/")).toBe("/posts/nested/path/");
+    expect(toPostHref("0123456789ab.md")).toBe("/posts/0123456789ab/");
     expect(toPostHref("")).toBe("/posts/");
   });
 
