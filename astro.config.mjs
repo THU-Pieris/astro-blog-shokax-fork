@@ -54,7 +54,6 @@ const mdxAutoImports = [
 
 import Font from "vite-plugin-font";
 
-import PlayformInline from "@playform/inline";
 import { installProcessWarningFilter } from "./src/toolkit/suppressWatcherWarning";
 import themeConfig from "./src/theme.config.ts";
 
@@ -87,9 +86,6 @@ export default defineConfig({
     sitemap(),
     hyacinePlugin(),
     mdx(),
-    PlayformInline({
-      Logger: 0,
-    }),
   ],
 
   vite: {
