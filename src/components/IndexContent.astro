@@ -83,7 +83,8 @@ if (hycEnable && cardExcerptSource === "ai") {
 
 const transformOptions = {
   encryptedExcerpt: t("post.encryptedExcerpt"),
-  resolveCover: (post: CollectionEntry<"posts">) => getPostCover(post, headerCovers),
+  resolveCover: (post: CollectionEntry<"posts">) =>
+    getPostCover(post, headerCovers, coverConfig.postFallbackCover),
   excerptSource: cardExcerptSource,
   aiSummaries,
 };

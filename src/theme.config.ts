@@ -66,6 +66,7 @@ export default defineConfig({
       enable: true,
       url: "https://pic.pieris05.com/api",
     },
+    postFallbackCover: "https://pic.pieris05.com/api",
     advancedCarousel: false,
     coverUrls: [],
     gradient: false,

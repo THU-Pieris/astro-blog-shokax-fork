@@ -9,6 +9,7 @@
 
 import { sample } from "es-toolkit";
 import type { Post } from "@/toolkit/posts/types";
+import { buildPostFallbackCoverUrl } from "@/toolkit/posts/fallbackCover";
 import type { ImageMetadata } from "astro";
 
 import cover1 from "@/assets/images/cover-1.avif";
@@ -49,9 +50,18 @@ export function resolveFixedCover(
 export function getPostCover(
   post: Partial<Post>,
   Covers?: Array<ImageMetadata | string>,
+  fallbackCoverUrl?: string,
 ): ImageMetadata | string {
   if (post?.data?.cover) {
     return post.data.cover;
+  }
+
+  const fallbackCover = buildPostFallbackCoverUrl(
+    fallbackCoverUrl,
+    post.id,
+  );
+  if (fallbackCover) {
+    return fallbackCover;
   }
 
   const defaultCovers = Covers?.length ? Covers : covers;
