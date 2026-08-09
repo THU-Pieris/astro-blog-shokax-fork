@@ -168,7 +168,7 @@ export default defineConfig({
     title: "友链",
     description: "Pieris 的朋友与常用链接。",
     comments: false,
-    avatar: "/assets/private/avatar.webp",
+    avatar: "https://cdn.jsdelivr.net/gh/THU-Pieris/Image@refs/heads/main/img/avatar.webp",
     color: "#58b2dc",
     links: [],
   },
