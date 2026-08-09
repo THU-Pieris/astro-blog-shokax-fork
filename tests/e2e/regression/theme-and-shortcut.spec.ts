@@ -1,10 +1,12 @@
 import { expect, test } from "@playwright/test";
+import { waitForAstroIslandHydration } from "../support/hydration";
 import { ROUTES } from "../support/routes";
 import { openSearchDialog } from "../support/search";
 
 test("@regression 主题切换后刷新仍保持", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(ROUTES.home);
+  await waitForAstroIslandHydration(page, "NavBar");
 
   const initialTheme = await page.evaluate(() => {
     return document.documentElement.dataset.theme;

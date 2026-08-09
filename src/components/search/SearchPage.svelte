@@ -90,7 +90,11 @@
       await customElements.whenDefined("pagefind-input");
     }
 
+    if (!visible) return;
+
     window.requestAnimationFrame(() => {
+      if (!visible) return;
+
       const inputComponent =
         panelElement?.querySelector<PagefindFocusable>("pagefind-input");
 

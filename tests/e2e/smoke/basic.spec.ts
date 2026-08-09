@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { waitForAstroIslandHydration } from "../support/hydration";
 import { POSTS, ROUTES } from "../support/routes";
+import { openSearchDialog } from "../support/search";
 
 test("@smoke 首页、分页与文章页面可访问", async ({ page }) => {
   const homeResponse = await page.goto(ROUTES.home);
@@ -23,9 +25,7 @@ test("@smoke 首页、分页与文章页面可访问", async ({ page }) => {
 test("@smoke 搜索面板可打开并通过 Escape 关闭", async ({ page }) => {
   await page.goto(ROUTES.home);
 
-  await page.getByRole("button", { name: "Search" }).click();
-  const searchDialog = page.getByRole("dialog", { name: "Search" });
-  await expect(searchDialog).toBeVisible();
+  const searchDialog = await openSearchDialog(page);
 
   await page.keyboard.press("Escape");
   await expect(searchDialog).not.toBeVisible();
@@ -41,6 +41,7 @@ test("@smoke 订阅页面可访问", async ({ page }) => {
 test("@smoke 主题切换与 moments 页面可达", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(ROUTES.home);
+  await waitForAstroIslandHydration(page, "NavBar");
 
   const initialTheme = await page.evaluate(() => {
     return document.documentElement.dataset.theme;

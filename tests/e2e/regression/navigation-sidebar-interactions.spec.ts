@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForAstroIslandHydration } from "../support/hydration";
 import { POSTS, ROUTES } from "../support/routes";
 
 test("@regression 导航栏入口与随机文章按钮可用", async ({ page }) => {
@@ -12,12 +13,17 @@ test("@regression 导航栏入口与随机文章按钮可用", async ({ page }) 
 
   await page.goto(ROUTES.home);
   await page.locator('#nav a[href="/random/"]').click();
-  await expect(page).toHaveURL(/\/posts\/[^/]+\/$/);
+  await expect(page).toHaveURL(/\/posts\/(?:[^/]+\/)+$/);
+  await expect(page.locator("article.post")).toBeVisible();
 });
 
 test("@regression 移动端侧边栏可通过导航按钮与遮罩开关", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(ROUTES.home);
+  await Promise.all([
+    waitForAstroIslandHydration(page, "NavBar"),
+    waitForAstroIslandHydration(page, "Sidebar"),
+  ]);
 
   const sidebar = page.locator("#sidebar");
   await expect(sidebar).not.toHaveClass(/\bon\b/);
@@ -33,6 +39,7 @@ test("@regression 移动端侧边栏可通过导航按钮与遮罩开关", async
 
 test("@regression 侧边栏目录面板可切换并响应目录点击", async ({ page }) => {
   await page.goto(POSTS.postMigrationTest);
+  await waitForAstroIslandHydration(page, "Sidebar");
 
   const contentsTab = page.locator("#sidebar .tab button.contents");
   if ((await contentsTab.count()) > 0) {
@@ -66,6 +73,7 @@ test("@regression 侧边栏目录面板可切换并响应目录点击", async ({
 
 test("@regression 浮动工具栏返回顶部与移动端切换侧栏可用", async ({ page }) => {
   await page.goto(POSTS.postMigrationTest);
+  await waitForAstroIslandHydration(page, "FloatingToolbar");
 
   await page.evaluate(() => {
     window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" });
@@ -87,6 +95,10 @@ test("@regression 浮动工具栏返回顶部与移动端切换侧栏可用", as
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(ROUTES.home);
+  await Promise.all([
+    waitForAstroIslandHydration(page, "FloatingToolbar"),
+    waitForAstroIslandHydration(page, "Sidebar"),
+  ]);
 
   const sidebar = page.locator("#sidebar");
   await expect(sidebar).not.toHaveClass(/\bon\b/);

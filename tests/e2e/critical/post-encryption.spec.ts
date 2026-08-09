@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { waitForAstroIslandHydration } from "../support/hydration";
 import { POSTS } from "../support/routes";
 
 test("@critical 加密文章具备 noindex 与 Pagefind 排除标记", async ({ page }) => {
@@ -12,6 +13,7 @@ test("@critical 加密文章具备 noindex 与 Pagefind 排除标记", async ({ 
 
 test("@critical 加密文章错误密码提示且正确密码可解锁", async ({ page }) => {
   await page.goto(POSTS.encryptedTest);
+  await waitForAstroIslandHydration(page, "EncryptedPost");
 
   const passwordInput = page.getByPlaceholder("请输入密码");
   await expect(passwordInput).toBeVisible();
