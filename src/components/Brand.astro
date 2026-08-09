@@ -1,5 +1,6 @@
 ---
 import { t } from "@/i18n";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 interface PostMeta {
   date: Date;
@@ -9,17 +10,21 @@ interface PostMeta {
 
 interface Props {
   title?: string;
+  titleLang?: PostLanguage;
   subtitle?: string;
   logo?: string;
   pageTitle?: string;
+  pageTitleLang?: PostLanguage;
   postMeta?: PostMeta;
 }
 
 const {
   title = "",
+  titleLang,
   subtitle = "",
   logo = "",
   pageTitle = "",
+  pageTitleLang,
   postMeta,
 } = Astro.props;
 
@@ -58,7 +63,10 @@ function formatWordCount(count: number): string {
 
     {
       displayTitle && (
-        <h1 class="letter-space-2  color-grey-0 text-5xl leading-tight tracking-wider font-600">
+        <h1
+          class="letter-space-2  color-grey-0 text-5xl leading-tight tracking-wider font-600"
+          lang={pageTitle ? pageTitleLang : titleLang}
+        >
           {displayTitle}
         </h1>
       )

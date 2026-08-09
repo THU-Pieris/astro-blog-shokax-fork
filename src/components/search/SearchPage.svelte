@@ -529,7 +529,8 @@
     --pagefind-ui-link-hover: var(--color-red);
     --pagefind-ui-border-width: 1px;
     --pagefind-ui-border-radius: 0.9rem;
-    --pagefind-ui-font: inherit;
+    --pagefind-ui-font: var(--font-sans-zh);
+    --pf-font: var(--font-sans-zh);
     --pagefind-ui-muted: var(--grey-5);
     --pagefind-ui-overlay: transparent;
     --pagefind-ui-backdrop: transparent;

@@ -155,7 +155,9 @@ let currentSlug = "c";
                 </div>
                 <div class="title">
                   <a href={toPostHref(post.id)} itemprop="url">
-                    <span itemprop="name">{post.data.title || t("category.untitled")}</span>
+                    <span itemprop="name" lang={post.data.lang}>
+                      {post.data.title || t("category.untitled")}
+                    </span>
                   </a>
                 </div>
               </article>

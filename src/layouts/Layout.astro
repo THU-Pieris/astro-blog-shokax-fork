@@ -16,6 +16,7 @@ import "@vtbag/element-crossing?url";
 import themeConfig from "@/theme.config.ts";
 
 import "@/styles/palette.css";
+import "@/styles/typography.css";
 import "@/styles/style.css";
 import "@/styles/header-cover.css";
 import "@/styles/mdx-components.css";
@@ -32,6 +33,7 @@ import { resolveHeaderCovers } from "@/toolkit/headerCover";
 import Footer from "@/components/footer/Footer.astro";
 import type { ImageMetadata } from "astro";
 import { currentLocale } from "@/i18n";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 // Accept sidebar props from child pages
 interface PostMeta {
@@ -46,6 +48,7 @@ interface Props {
   currentSlug?: string;
   navigation?: QuickNavigation;
   pageTitle?: string;
+  pageTitleLang?: PostLanguage;
   postMeta?: PostMeta;
   indexPage?: boolean;
   pageCover?: ImageMetadata | string;
@@ -57,6 +60,7 @@ const {
   currentSlug = "",
   navigation = {},
   pageTitle = "",
+  pageTitleLang,
   postMeta,
   indexPage = false,
   pageCover,
@@ -204,9 +208,11 @@ import SearchPage from "@/components/search/SearchPage.svelte";
       />
       <Brand
         title={brandConfig.title}
+        titleLang={brandConfig.titleLang}
         subtitle={brandConfig.subtitle}
         logo={brandConfig.logo}
         pageTitle={indexPage ? "" : pageTitle}
+        pageTitleLang={indexPage ? undefined : pageTitleLang}
         postMeta={postMeta}
       />
       <Waves />
@@ -235,18 +241,6 @@ import SearchPage from "@/components/search/SearchPage.svelte";
     </div>
     <script>
       import "@/toolkit/initMdxComponents";
-    </script>
-    <script>
-      import { css } from "@/assets/fonts/LXGWWenKai-Regular.ttf?subsets";
-
-      document.addEventListener("pagereveal", () => {
-        document.body.style.fontFamily = css.family as string;
-        document.documentElement.style.setProperty("--pf-font", css.family as string);
-      });
-      document.addEventListener("DOMContentLoaded", () => {
-        document.body.style.fontFamily = css.family as string;
-        document.documentElement.style.setProperty("--pf-font", css.family as string);
-      });
     </script>
     <script>
       type VisibilityTitleScriptConfig = {

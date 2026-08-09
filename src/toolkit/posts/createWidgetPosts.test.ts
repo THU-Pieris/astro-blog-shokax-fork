@@ -20,7 +20,9 @@ describe("createWidgetPosts", () => {
         id: "encrypted-test",
         data: {
           title: "Encrypted Post",
+          lang: undefined,
           description: "",
+          descriptionLang: undefined,
         },
       },
     ]);
@@ -77,5 +79,35 @@ describe("createWidgetPosts", () => {
     );
 
     expect(result[0].data.description).toBe("😀");
+  });
+
+  it("propagates title and description languages", () => {
+    const result = createWidgetPosts([
+      {
+        id: "language-post",
+        body: "fallback",
+        data: {
+          title: "Japanese title",
+          lang: "ja",
+          description: "English summary",
+          descriptionLang: "en",
+        },
+      },
+    ]);
+
+    expect(result[0].data.lang).toBe("ja");
+    expect(result[0].data.descriptionLang).toBe("en");
+  });
+
+  it("uses post language for a body-derived description", () => {
+    const result = createWidgetPosts([
+      {
+        id: "body-language-post",
+        body: "English body",
+        data: { title: "English", lang: "en" },
+      },
+    ]);
+
+    expect(result[0].data.descriptionLang).toBe("en");
   });
 });

@@ -1,9 +1,11 @@
 <script lang="ts">
   import { t } from "@/i18n";
+  import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
   interface PostInfo {
     title: string;
     url: string;
+    lang?: PostLanguage;
   }
 
   interface Props {
@@ -89,7 +91,7 @@
       <ul class="posts">
         {#each posts.slice(0, 6) as post}
           <li>
-            <a href={post.url} title={post.title}>
+            <a href={post.url} title={post.title} lang={post.lang}>
               {post.title}
             </a>
           </li>

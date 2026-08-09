@@ -98,7 +98,7 @@ function formatDate(date: Date): string {
 
                   <div class="title">
                     <a href={toPostHref(post.id)} itemprop="url">
-                      <span itemprop="name">
+                      <span itemprop="name" lang={post.data.lang}>
                         {post.data.title || t("post.noContent")}
                       </span>
                     </a>

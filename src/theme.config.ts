@@ -55,6 +55,7 @@ export default defineConfig({
 
   brand: {
     title: "アセビ。",
+    titleLang: "ja",
     subtitle: "迁移自Wordpress，再也不弄动态博客了QAQ",
     logo: "",
   },

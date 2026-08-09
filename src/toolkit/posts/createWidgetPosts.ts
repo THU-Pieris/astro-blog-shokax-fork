@@ -1,8 +1,12 @@
+import { resolveDescriptionLanguage, type PostLanguage } from "./postLanguage";
+
 export interface WidgetPost {
   id: string;
   data: {
     title: string;
+    lang?: PostLanguage;
     description: string;
+    descriptionLang?: PostLanguage;
   };
 }
 
@@ -11,7 +15,9 @@ export interface WidgetPostSource {
   body?: string;
   data: {
     title: string;
+    lang?: PostLanguage;
     description?: string;
+    descriptionLang?: PostLanguage;
     encrypted?: boolean;
     password?: string;
   };
@@ -51,7 +57,11 @@ export function createWidgetPosts(
       id: post.id,
       data: {
         title: post.data.title,
+        lang: post.data.lang,
         description: explicitDescription || bodyExcerpt,
+        descriptionLang: explicitDescription
+          ? resolveDescriptionLanguage(post.data.lang, post.data.descriptionLang)
+          : post.data.lang,
       },
     };
   });

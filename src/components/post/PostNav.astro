@@ -2,9 +2,11 @@
 import { currentLocale, getT } from "@/i18n";
 import { buildPostFallbackCoverUrl } from "@/toolkit/posts/fallbackCover";
 import { generateRandomBrightColor } from "@/toolkit/tools/generateRandomBrightColor";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 interface NavPost {
   title: string;
+  lang?: PostLanguage;
   slug: string;
   category?: string;
   cover?: string;
@@ -53,7 +55,7 @@ function getPostNavBackground(post: NavPost): string | undefined {
               {prevPost.category}
             </span>
           )}
-          <span class="post-nav-title">{prevPost.title}</span>
+          <span class="post-nav-title" lang={prevPost.lang}>{prevPost.title}</span>
         </a>
       )
     }
@@ -76,7 +78,7 @@ function getPostNavBackground(post: NavPost): string | undefined {
               {nextPost.category}
             </span>
           )}
-          <span class="post-nav-title">{nextPost.title}</span>
+          <span class="post-nav-title" lang={nextPost.lang}>{nextPost.title}</span>
         </a>
       )
     }

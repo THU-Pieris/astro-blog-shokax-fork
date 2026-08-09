@@ -1,7 +1,10 @@
 ---
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
+
 interface SimilarPostItem {
   slug: string;
   title: string;
+  lang?: PostLanguage;
   score: number;
 }
 
@@ -39,7 +42,9 @@ const visiblePosts = posts
         {visiblePosts.map((item) => (
           <li class="ai-similar-posts__item">
             <a href={`/posts/${item.slug}/`} class="text-color">
-              <span class="ai-similar-posts__name">{item.title}</span>
+              <span class="ai-similar-posts__name" lang={item.lang}>
+                {item.title}
+              </span>
               <span class="ai-similar-posts__score text-grey-5">
                 相似度 {Math.round(item.score * 100)}%
               </span>

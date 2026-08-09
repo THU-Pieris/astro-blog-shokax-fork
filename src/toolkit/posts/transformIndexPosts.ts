@@ -2,6 +2,7 @@ import type { ImageMetadata } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { countWords } from "./calculateStats";
 import { toCategoryHref, toPostHref } from "./url";
+import { resolveDescriptionLanguage, type PostLanguage } from "./postLanguage";
 
 const DEFAULT_EXCERPT_LENGTH = 300;
 const DEFAULT_WORDS_PER_MINUTE = 300;
@@ -16,9 +17,11 @@ export type ExcerptSource = "default" | "ai";
 export interface TransformedIndexPost {
   slug: string;
   title: string;
+  lang?: PostLanguage;
   url: string;
   date: Date;
   excerpt: string;
+  excerptLang?: PostLanguage;
   cover?: ImageMetadata | string;
   category?: string;
   categoryUrl?: string;
@@ -106,9 +109,13 @@ export function transformIndexPosts(
     return {
       slug: post.id,
       title: post.data.title,
+      lang: post.data.lang,
       url: toPostHref(post.id),
       date: post.data.date,
       excerpt: getExcerpt(post, encryptedExcerpt, excerptLength, aiSummary),
+      excerptLang: post.data.encrypted
+        ? undefined
+        : resolveDescriptionLanguage(post.data.lang, post.data.descriptionLang),
       cover: resolveCover?.(post),
       category: lastCategory,
       categoryUrl: lastCategory ? toCategoryHref(lastCategory) : undefined,

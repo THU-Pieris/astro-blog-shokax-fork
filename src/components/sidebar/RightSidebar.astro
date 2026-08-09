@@ -8,6 +8,7 @@ import {
 } from "@/toolkit/ui/rightSidebar";
 import SidebarCalendarPlaceholder from "./SidebarCalendarPlaceholder.astro";
 import AnnouncementContent from "@/content/announcement.md";
+import { resolveDescriptionLanguage } from "@/toolkit/posts/postLanguage";
 
 interface Props {
   config?: {
@@ -67,14 +68,21 @@ const latestMoments = moments.slice(0, 1).map((moment) => ({
 }));
 
 const sampledPost = showRandomPosts ? sample(posts) : undefined;
+const sampledPostDescription = sampledPost?.data.description?.trim() || "";
 const shuffledPosts = sampledPost
   ? [
       {
         id: sampledPost.id,
         href: `/posts/${sampledPost.id}/`,
         title: sampledPost.data.title,
-        description:
-          sampledPost.data.description || String(sampledPost.body || ""),
+        lang: sampledPost.data.lang,
+        description: sampledPostDescription || String(sampledPost.body || ""),
+        descriptionLang: sampledPostDescription
+          ? resolveDescriptionLanguage(
+              sampledPost.data.lang,
+              sampledPost.data.descriptionLang,
+            )
+          : sampledPost.data.lang,
       },
     ]
   : [];
@@ -211,10 +219,13 @@ const hasRenderedContent =
                 {shuffledPosts.map((post) => (
                   <li class="extra-list__item">
                     <a href={post.href} class="extra-list__link">
-                      <span class="extra-list__title">
+                      <span class="extra-list__title" lang={post.lang}>
                         {truncateRightSidebarText(post.title, 26)}
                       </span>
-                      <span class="extra-list__desc">
+                      <span
+                        class="extra-list__desc"
+                        lang={post.descriptionLang}
+                      >
                         {truncateRightSidebarText(post.description, 42)}
                       </span>
                     </a>

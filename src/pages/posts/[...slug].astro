@@ -22,6 +22,7 @@ import { wrapRenderedCodeBlocks } from "@/toolkit/wrapRenderedCodeBlocks";
 import { wrapRenderedImages } from "@/toolkit/wrapRenderedImages";
 import { wrapCodeGroups } from "@/toolkit/wrapCodeGroups";
 import { wrapExternalLinks } from "@/toolkit/wrapExternalLinks";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 import "@/styles/post.css";
 
@@ -38,6 +39,11 @@ export async function getStaticPaths() {
   const sortedPosts = posts
     .filter((post) => !post.data.draft)
     .toSorted((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const postLanguageBySlug = Object.fromEntries(
+    sortedPosts.flatMap((post) =>
+      post.data.lang ? [[post.id, post.data.lang]] : [],
+    ),
+  ) as Partial<Record<string, PostLanguage>>;
 
   const container = await createPostContentContainer();
 
@@ -61,6 +67,7 @@ export async function getStaticPaths() {
               .map((p) => ({
                 slug: p.id,
                 title: p.data.title,
+                lang: p.data.lang,
                 date: p.data.date,
                 category: p.data.categories?.[0],
               }))
@@ -115,6 +122,7 @@ export async function getStaticPaths() {
           prevPost: prevPost
             ? {
                 title: prevPost.data.title,
+                lang: prevPost.data.lang,
                 slug: prevPost.id,
                 category: prevPost.data.categories?.[0],
                 cover:
@@ -126,6 +134,7 @@ export async function getStaticPaths() {
           nextPost: nextPost
             ? {
                 title: nextPost.data.title,
+                lang: nextPost.data.lang,
                 slug: nextPost.id,
                 category: nextPost.data.categories?.[0],
                 cover:
@@ -135,6 +144,7 @@ export async function getStaticPaths() {
               }
             : undefined,
           relatedPosts,
+          postLanguageBySlug,
           isEncrypted,
           renderedContentHtml,
           encryptedContent,
@@ -150,12 +160,14 @@ interface Props {
   post: import("astro:content").CollectionEntry<"posts">;
   prevPost?: {
     title: string;
+    lang?: PostLanguage;
     slug: string;
     category?: string;
     cover?: string;
   };
   nextPost?: {
     title: string;
+    lang?: PostLanguage;
     slug: string;
     category?: string;
     cover?: string;
@@ -163,9 +175,11 @@ interface Props {
   relatedPosts: {
     slug: string;
     title: string;
+    lang?: PostLanguage;
     date: Date;
     category?: string;
   }[];
+  postLanguageBySlug: Partial<Record<string, PostLanguage>>;
   isEncrypted: boolean;
   renderedContentHtml?: string;
   encryptedContent?: EncryptedData;
@@ -178,6 +192,7 @@ const {
   prevPost,
   nextPost,
   relatedPosts,
+  postLanguageBySlug,
   isEncrypted,
   renderedContentHtml,
   encryptedContent,
@@ -198,8 +213,10 @@ const toc: TocItem[] = isEncrypted
 const navigation: QuickNavigation = {
   prevUrl: prevPost ? toPostHref(prevPost.slug) : undefined,
   prevTitle: prevPost?.title,
+  prevLang: prevPost?.lang,
   nextUrl: nextPost ? toPostHref(nextPost.slug) : undefined,
   nextTitle: nextPost?.title,
+  nextLang: nextPost?.lang,
 };
 
 // Calculate word count from content
@@ -244,6 +261,7 @@ const aiRecommendMinSimilarity = Math.min(
 interface AiRecommendPost {
   slug: string;
   title: string;
+  lang?: PostLanguage;
   score: number;
 }
 
@@ -304,6 +322,7 @@ if (!isEncrypted && hycEnable && aiRecommendEnable) {
       .map((item) => ({
         slug: item.slug,
         title: item.title,
+        lang: postLanguageBySlug[item.slug],
         score: item.score,
       }));
   } catch {
@@ -333,6 +352,7 @@ const postMeta = {
   currentSlug={post.id}
   navigation={navigation}
   pageTitle={post.data.title}
+  pageTitleLang={post.data.lang}
   postMeta={postMeta}
   pageCover={post.data.cover}
 >
@@ -358,7 +378,7 @@ const postMeta = {
         itemtype="http://schema.org/Article"
         class="post block"
         data-pagefind-body={!isEncrypted}
-        lang={currentLocale}
+        lang={post.data.lang ?? currentLocale}
       >
         <link itemprop="mainEntityOfPage" href={permalink} />
 
