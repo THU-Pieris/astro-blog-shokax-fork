@@ -1,6 +1,7 @@
 import type { NavItemType } from "@/components/navbar/NavTypes";
 import type { SidebarConfig } from "@/components/sidebar/SidebarTypes";
 import type { Locale } from "@/i18n";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 import { sanitizeThemeColor, type ThemeColorValue } from "./themeColor";
 import { DEFAULT_THEME_CONFIG } from "./themeConfig.defaults";
 
@@ -11,6 +12,9 @@ interface BrandConfig {
    * - 会与 logo 和 subtitle 组合显示
    */
   title?: string;
+
+  /** 标题的内容语言，用于选择正确的中日文字形。 */
+  titleLang?: PostLanguage;
 
   /**
    * 网站副标题。

@@ -1,5 +1,6 @@
 import { describe, expect, it } from "bun:test";
 import { calculateReadTime, getExcerpt, transformIndexPosts } from "./transformIndexPosts";
+import type { PostLanguage } from "./postLanguage";
 
 type MockPost = {
   id: string;
@@ -8,6 +9,8 @@ type MockPost = {
     title: string;
     date: Date;
     description?: string;
+    lang?: PostLanguage;
+    descriptionLang?: PostLanguage;
     encrypted?: boolean;
     categories?: string[];
   };
@@ -114,6 +117,47 @@ describe("transformIndexPosts", () => {
 
     expect(transformed[0].category).toBeUndefined();
     expect(transformed[0].categoryUrl).toBeUndefined();
+  });
+
+  it("propagates title and excerpt languages with description override", () => {
+    const post: MockPost = {
+      id: "language-post",
+      body: "body content",
+      data: {
+        title: "Japanese title",
+        date: new Date("2025-01-03T00:00:00Z"),
+        description: "English description",
+        lang: "ja",
+        descriptionLang: "en",
+      },
+    };
+
+    // eslint-disable-next-line no-unsafe-type-assertion
+    const [transformed] = transformIndexPosts([post as any], {
+      encryptedExcerpt: "[ENCRYPTED]",
+    });
+
+    expect(transformed.lang).toBe("ja");
+    expect(transformed.excerptLang).toBe("en");
+  });
+
+  it("inherits the page language when no post language is configured", () => {
+    const post: MockPost = {
+      id: "inherited-language-post",
+      body: "body content",
+      data: {
+        title: "Inherited",
+        date: new Date("2025-01-03T00:00:00Z"),
+      },
+    };
+
+    // eslint-disable-next-line no-unsafe-type-assertion
+    const [transformed] = transformIndexPosts([post as any], {
+      encryptedExcerpt: "[ENCRYPTED]",
+    });
+
+    expect(transformed.lang).toBeUndefined();
+    expect(transformed.excerptLang).toBeUndefined();
   });
 
   it("prefers AI summary over description and body when provided", () => {

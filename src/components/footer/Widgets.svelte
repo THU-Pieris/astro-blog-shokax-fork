@@ -3,13 +3,16 @@
   import { onMount } from "svelte";
   import { currentLocale, t } from "@/i18n";
   import { toPostHref } from "@/toolkit/posts/url";
+  import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
   interface Post {
     id: string;
     slug?: string;
     data: {
       title: string;
+      lang?: PostLanguage;
       description?: string;
+      descriptionLang?: PostLanguage;
     };
   }
 
@@ -172,10 +175,14 @@
               href={toPostHref(post.slug || post.id)}
               class="hover:text-color-link text-inherit no-underline flex flex-col transition-colors"
             >
-              <span class="widget-title text-sm font-semibold m-0 max-h-6"
+              <span
+                class="widget-title text-sm font-semibold m-0 max-h-6"
+                lang={post.data.lang}
                 >{post.data.title}</span
               >
-              <span class="text-grey-5 text-xs mt-1 max-h-8"
+              <span
+                class="text-grey-5 text-xs mt-1 max-h-8"
+                lang={post.data.descriptionLang}
                 >{truncateText(post.data.description || "")}</span
               >
             </a>

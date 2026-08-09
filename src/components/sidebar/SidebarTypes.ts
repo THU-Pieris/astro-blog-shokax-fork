@@ -1,5 +1,6 @@
 import type { NavItemType } from "../navbar/NavTypes";
 import type { ThemeColorValue } from "@/toolkit/themeColor";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 export interface SidebarConfig {
   /**
@@ -68,6 +69,7 @@ export interface TocItem {
 export interface RelatedPost {
   slug: string;
   title: string;
+  lang?: PostLanguage;
   date?: Date;
   category?: string;
 }
@@ -76,8 +78,10 @@ export interface RelatedPost {
 export interface QuickNavigation {
   prevUrl?: string;
   prevTitle?: string;
+  prevLang?: PostLanguage;
   nextUrl?: string;
   nextTitle?: string;
+  nextLang?: PostLanguage;
 }
 
 // Sidebar panel types

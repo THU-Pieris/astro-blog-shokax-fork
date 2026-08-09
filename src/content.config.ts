@@ -2,6 +2,7 @@ import { glob } from "astro/loaders";
 import { defineCollection } from "astro:content";
 import { z } from "astro/zod";
 import { FOLDER_CATEGORY_TOKEN, withFolderCategories } from "./toolkit/posts/folderCategories";
+import { POST_LANGUAGES } from "./toolkit/posts/postLanguage";
 
 const posts = defineCollection({
   loader: withFolderCategories(
@@ -14,6 +15,8 @@ const posts = defineCollection({
     z.object({
       title: z.string(),
       description: z.string().optional(),
+      lang: z.enum(POST_LANGUAGES).optional(),
+      descriptionLang: z.enum(POST_LANGUAGES).optional(),
       date: z.date().refine((date) => !Number.isNaN(date.getTime()), {
         message: "Invalid date format",
       }),

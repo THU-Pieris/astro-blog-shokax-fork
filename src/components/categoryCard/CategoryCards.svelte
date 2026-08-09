@@ -1,10 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import CategoryCard from "./CategoryCard.svelte";
+  import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
   interface PostInfo {
     title: string;
     url: string;
+    lang?: PostLanguage;
   }
 
   interface CategoryItem {

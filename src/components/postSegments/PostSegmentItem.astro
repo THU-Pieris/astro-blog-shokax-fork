@@ -3,12 +3,15 @@ import { Image } from "astro:assets";
 import PostMeta from "./PostMeta.astro";
 import type { ImageMetadata } from "astro";
 import ResilientImage from "../ResilientImage.astro";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 export interface Props {
   title: string;
+  lang?: PostLanguage;
   url: string;
   date: Date;
   excerpt: string;
+  excerptLang?: PostLanguage;
   cover?: ImageMetadata | string;
   category?: string;
   categoryUrl?: string;
@@ -20,9 +23,11 @@ export interface Props {
 
 const {
   title,
+  lang,
   url,
   date,
   excerpt,
+  excerptLang,
   cover,
   category,
   categoryUrl,
@@ -70,10 +75,10 @@ const {
     <PostMeta date={date} wordCount={wordCount} readTime={readTime} />
 
     <h3>
-      <a href={url} title={title}>{title}</a>
+      <a href={url} title={title} lang={lang}>{title}</a>
     </h3>
 
-    <div class="excerpt">
+    <div class="excerpt" lang={excerptLang}>
       {excerpt}
     </div>
 

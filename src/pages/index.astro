@@ -4,6 +4,7 @@ import IndexContent from "../components/IndexContent.astro";
 import Pagination from "../components/Pagination.astro";
 import { getCollection } from "astro:content";
 import themeConfig from "@/theme.config";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 // Fetch all posts
 const allPosts = await getCollection("posts");
@@ -40,7 +41,7 @@ const categoryMap = new Map<
   string,
   {
     name: string;
-    posts: Array<{ title: string; slug: string }>;
+    posts: Array<{ title: string; slug: string; lang?: PostLanguage }>;
   }
 >();
 
@@ -56,6 +57,7 @@ publishedPosts.forEach((post) => {
     categoryMap.get(cat)!.posts.push({
       title: post.data.title,
       slug: post.id,
+      lang: post.data.lang,
     });
   });
 });
@@ -75,6 +77,7 @@ const categories = Array.from(categoryMap.entries())
     posts: data.posts.slice(0, 6).map((p) => ({
       title: p.title,
       url: `/posts/${p.slug}/`,
+      lang: p.lang,
     })),
   }))
   .toSorted((a, b) => b.postCount - a.postCount);

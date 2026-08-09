@@ -1,0 +1,26 @@
+:root {
+  --font-sans-zh:
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue",
+    "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC",
+    "Noto Sans SC", Arial, sans-serif;
+  --font-sans-ja:
+    -apple-system, BlinkMacSystemFont, "Segoe UI Variable", "Segoe UI", Roboto, "Helvetica Neue",
+    "Hiragino Sans", "Yu Gothic UI", "Yu Gothic", Meiryo, "Noto Sans CJK JP", "Noto Sans JP", Arial,
+    sans-serif;
+}
+
+body {
+  /* Pagefind 自带 :root 默认值；在更近的 body 上覆盖，确保搜索界面沿用正文。 */
+  --pf-font: var(--font-sans-zh);
+  font-family: var(--font-sans-zh);
+}
+
+/* 只设置显式语言边界；后代继承即可，避免覆盖代码块等组件字体。 */
+:where([lang|="ja"]) {
+  font-family: var(--font-sans-ja);
+}
+
+/* 若未来把整站 locale 切到日文，body 不能继续使用中文默认栈。 */
+:where(html[lang|="ja"]) body {
+  font-family: var(--font-sans-ja);
+}

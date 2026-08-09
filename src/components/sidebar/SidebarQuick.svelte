@@ -52,6 +52,7 @@
         href={navigation.prevUrl}
         rel="prev"
         title={navigation.prevTitle || t("pagination.prev")}
+        lang={navigation.prevLang}
       >
         <i class="ic i-ri-arrow-left-s-line"></i>
       </a>
@@ -81,6 +82,7 @@
         href={navigation.nextUrl}
         rel="next"
         title={navigation.nextTitle || t("pagination.next")}
+        lang={navigation.nextLang}
       >
         <i class="ic i-ri-arrow-right-s-line"></i>
       </a>

@@ -100,7 +100,7 @@ function getLastCategory(categories: string[]): string | undefined {
                   href={toPostHref(post.id)}
                   itemprop="url"
                 >
-                  <span itemprop="name">
+                  <span itemprop="name" lang={post.data.lang}>
                     {post.data.title || t("post.noContent")}
                   </span>
                 </a>

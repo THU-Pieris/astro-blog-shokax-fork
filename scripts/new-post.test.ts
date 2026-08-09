@@ -50,6 +50,7 @@ describe("new post generator", () => {
     const content = createPostContent('  中文“标题”与 "引号"  ', new Date(2026, 7, 9));
 
     expect(content).toContain('title: "中文“标题”与 \\"引号\\""');
+    expect(content).toContain("lang: zh-CN");
     expect(content).toContain("date: 2026-08-09");
     expect(content).toContain("draft: true");
   });
@@ -77,7 +78,27 @@ describe("new post generator", () => {
     expect(parseArguments(["中文", "标题", "--posts-dir", "../content/posts"])).toEqual({
       title: "中文 标题",
       postsDirectory: "../content/posts",
+      lang: "zh-CN",
     });
+  });
+
+  test("accepts supported language options in both CLI forms", () => {
+    expect(parseArguments(["日本語の記事", "--lang", "ja"])).toEqual({
+      title: "日本語の記事",
+      postsDirectory: undefined,
+      lang: "ja",
+    });
+    expect(parseArguments(["English post", "--lang=en"])).toEqual({
+      title: "English post",
+      postsDirectory: undefined,
+      lang: "en",
+    });
+  });
+
+  test("rejects missing, unsupported, and duplicate language options", () => {
+    expect(() => parseArguments(["标题", "--lang"])).toThrow("--lang 后必须提供语言代码");
+    expect(() => parseArguments(["标题", "--lang=fr"])).toThrow("zh-CN、ja、en");
+    expect(() => parseArguments(["标题", "--lang=ja", "--lang=en"])).toThrow("--lang 不能重复指定");
   });
 
   test("prefers an explicit directory over the environment", () => {
@@ -109,6 +130,19 @@ describe("new post generator", () => {
 
     expect(postPath).toBe(join(postsDirectory, "0123abcdef45.md"));
     expect(await readFile(postPath, "utf8")).toContain('title: "迁移后的第一篇文章"');
+  });
+
+  test("writes the selected language into frontmatter", async () => {
+    const postsDirectory = await createTemporaryDirectory();
+    const postPath = await createPost({
+      title: "日本語の記事",
+      postsDirectory,
+      date: new Date(2026, 7, 9),
+      postId: "abcdef012345",
+      lang: "ja",
+    });
+
+    expect(await readFile(postPath, "utf8")).toContain("lang: ja");
   });
 
   test("rejects IDs that are not 12-character lowercase hexadecimal strings", async () => {

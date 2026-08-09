@@ -2,6 +2,11 @@ import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join, resolve } from "node:path";
+import {
+  DEFAULT_POST_LANGUAGE,
+  parsePostLanguage,
+  type PostLanguage,
+} from "../src/toolkit/posts/postLanguage";
 
 export const POST_ID_PATTERN = /^[0-9a-f]{12}$/;
 
@@ -13,11 +18,13 @@ export interface CreatePostOptions {
   postsDirectory: string;
   date?: Date;
   postId?: string;
+  lang?: PostLanguage;
 }
 
 export interface ParsedArguments {
   title: string;
   postsDirectory?: string;
+  lang: PostLanguage;
 }
 
 export function normalizeTitle(input: string): string {
@@ -52,13 +59,18 @@ export function formatLocalDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
-export function createPostContent(titleInput: string, date: Date): string {
+export function createPostContent(
+  titleInput: string,
+  date: Date,
+  lang: PostLanguage = DEFAULT_POST_LANGUAGE,
+): string {
   const title = normalizeTitle(titleInput);
   const yamlTitle = JSON.stringify(title);
 
   return [
     "---",
     `title: ${yamlTitle}`,
+    `lang: ${lang}`,
     `date: ${formatLocalDate(date)}`,
     "tags: []",
     "categories: []",
@@ -72,6 +84,8 @@ export function createPostContent(titleInput: string, date: Date): string {
 export function parseArguments(args: string[]): ParsedArguments {
   const titleParts: string[] = [];
   let postsDirectory: string | undefined;
+  let lang: PostLanguage = DEFAULT_POST_LANGUAGE;
+  let hasExplicitLang = false;
 
   for (let index = 0; index < args.length; index += 1) {
     const argument = args[index];
@@ -98,6 +112,29 @@ export function parseArguments(args: string[]): ParsedArguments {
       continue;
     }
 
+    if (argument === "--lang") {
+      const value = args[index + 1];
+      if (!value || value.startsWith("--")) {
+        throw new Error("--lang 后必须提供语言代码（zh-CN、ja 或 en）");
+      }
+      if (hasExplicitLang) {
+        throw new Error("--lang 不能重复指定");
+      }
+      lang = parsePostLanguage(value);
+      hasExplicitLang = true;
+      index += 1;
+      continue;
+    }
+
+    if (argument.startsWith("--lang=")) {
+      if (hasExplicitLang) {
+        throw new Error("--lang 不能重复指定");
+      }
+      lang = parsePostLanguage(argument.slice("--lang=".length));
+      hasExplicitLang = true;
+      continue;
+    }
+
     if (argument.startsWith("--")) {
       throw new Error(`未知参数：${argument}`);
     }
@@ -108,6 +145,7 @@ export function parseArguments(args: string[]): ParsedArguments {
   return {
     title: normalizeTitle(titleParts.join(" ")),
     postsDirectory,
+    lang,
   };
 }
 
@@ -160,10 +198,14 @@ export async function createPost(options: CreatePostOptions): Promise<string> {
   await mkdir(options.postsDirectory, { recursive: true });
 
   try {
-    await writeFile(markdownPath, createPostContent(title, options.date ?? new Date()), {
-      encoding: "utf8",
-      flag: "wx",
-    });
+    await writeFile(
+      markdownPath,
+      createPostContent(title, options.date ?? new Date(), options.lang),
+      {
+        encoding: "utf8",
+        flag: "wx",
+      },
+    );
   } catch (error) {
     if (isCollisionError(error)) {
       throw new Error(`文章 ID 冲突：${postId}`, { cause: error });
@@ -180,6 +222,7 @@ async function main(): Promise<void> {
   const postPath = await createPost({
     title: parsed.title,
     postsDirectory,
+    lang: parsed.lang,
   });
 
   console.log(`已创建草稿：${postPath}`);

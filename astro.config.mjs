@@ -20,6 +20,7 @@ import mdx from "@astrojs/mdx";
 import spoiler from "./src/satteri-plugins/spoiler.ts";
 import noteDirective from "./src/satteri-plugins/note-directive.ts";
 import spanDirective from "./src/satteri-plugins/span-directive.ts";
+import langDirective from "./src/satteri-plugins/lang-directive.ts";
 import satteriBreaks from "./src/satteri-plugins/breaks.ts";
 import satteriIns from "./src/satteri-plugins/ins.ts";
 import satteriKatex from "./src/satteri-plugins/katex.ts";
@@ -135,6 +136,7 @@ export default defineConfig({
         satteriRubyDirective(),
         noteDirective(),
         spanDirective(),
+        langDirective(),
         codeGroup(),
         [spoiler, { title: "..." }],
       ],

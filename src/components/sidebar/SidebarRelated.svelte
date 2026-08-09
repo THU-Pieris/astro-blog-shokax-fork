@@ -21,6 +21,7 @@
           <a
             href={`/posts/${post.slug}/`}
             title={post.title}
+            lang={post.lang}
             class="text-ellipsis whitespace-nowrap overflow-hidden w-full inline-block text-inherit no-underline transition-colors duration-200"
           >
             {post.title}

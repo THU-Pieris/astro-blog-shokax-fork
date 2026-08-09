@@ -8,6 +8,7 @@ import { covers, getPostCover } from "./Images.astro";
 import { resolveHeaderCovers } from "@/toolkit/headerCover";
 import { t } from "@/i18n";
 import themeConfig from "@/theme.config";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 interface CategoryItem {
   name: string;
@@ -19,7 +20,7 @@ interface CategoryItem {
   };
   postCount: number;
   childCount?: number;
-  posts: Array<{ title: string; url: string }>;
+  posts: Array<{ title: string; url: string; lang?: PostLanguage }>;
 }
 
 interface Props {
