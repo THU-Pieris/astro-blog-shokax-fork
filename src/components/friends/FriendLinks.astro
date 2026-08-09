@@ -1,6 +1,7 @@
 ---
 import type { FriendLinkData } from "@/toolkit/friendsData";
 import { sanitizeThemeColor } from "@/toolkit/themeColor";
+import friendAvatarPlaceholder from "@/assets/images/friend-avatar-placeholder.svg";
 
 interface Props {
   links: FriendLinkData[];
@@ -42,22 +43,20 @@ const safeLinks = links.map((link, index) =>
           </a>
         )}
         <div class="friend-body">
-          {link.avatar && (
-            <a
-              class="friend-avatar"
-              href={link.url}
-              target="_blank"
-              rel="noreferrer"
-              aria-label={`访问 ${link.author || link.title} 站点`}
-            >
-              <img
-                src={link.avatar}
-                alt={`${link.author || link.title} 头像`}
-                loading="lazy"
-                decoding="async"
-              />
-            </a>
-          )}
+          <a
+            class="friend-avatar"
+            href={link.url}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`访问 ${link.author || link.title} 站点`}
+          >
+            <img
+              src={link.avatar ?? friendAvatarPlaceholder.src}
+              alt={`${link.author || link.title} 头像`}
+              loading="lazy"
+              decoding="async"
+            />
+          </a>
           <div class="friend-content">
             <div class="friend-title-row">
               <a
