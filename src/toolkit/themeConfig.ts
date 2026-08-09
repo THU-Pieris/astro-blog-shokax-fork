@@ -413,11 +413,11 @@ export interface FriendLinkConfig {
   /** 站点标题 */
   title: string;
   /** 站点描述 */
-  desc: string;
+  desc?: string;
   /** 作者或站点主理人 */
-  author: string;
+  author?: string;
   /** 头像地址 */
-  avatar: string;
+  avatar?: string;
   /** 主题色（可选，支持 CSS 颜色值或变量） */
   color?: ThemeColorValue;
   /** 站点预览图（可选） */

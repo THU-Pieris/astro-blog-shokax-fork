@@ -3,6 +3,7 @@ export const ROUTES = {
   page2: "/page/2/",
   page3: "/page/3/",
   moments: "/moments/",
+  subscribe: "/subscribe/",
   tags: "/tags/",
   categories: "/categories/",
 } as const;

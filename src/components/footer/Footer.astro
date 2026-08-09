@@ -65,6 +65,13 @@ const iconColor = sanitizeThemeColor(
   "var(--color-pink)",
   "footer.icon.color(runtime)",
 );
+
+const sourceRepository =
+  "https://github.com/THU-Pieris/astro-blog-shokax-fork";
+const sourceRef = import.meta.env.PUBLIC_SOURCE_REF?.trim() ?? "";
+const sourceUrl = /^[0-9a-f]{40}$/i.test(sourceRef)
+  ? `${sourceRepository}/tree/${sourceRef}`
+  : sourceRepository;
 ---
 
 <footer
@@ -132,6 +139,19 @@ const iconColor = sanitizeThemeColor(
           </div>
         )
       }
+
+      <!-- AGPL 网络服务的对应源代码入口；部署时可固定到本次构建的 commit SHA。 -->
+      <div class="source-code block my-2 text-xs">
+        <a
+          href={sourceUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="查看本站源代码"
+          class="hover:opacity-80 border-b border-dashed"
+        >
+          Source / 源代码
+        </a>
+      </div>
 
       <!-- ICP Section -->
       {

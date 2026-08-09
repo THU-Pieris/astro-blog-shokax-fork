@@ -3,6 +3,7 @@
   "version": "1.6.0",
   "type": "module",
   "scripts": {
+    "new": "bun run scripts/new-post.ts",
     "dev": "bunx --bun astro dev",
     "build:site": "bunx --bun astro build",
     "build:index": "bunx --bun pagefind --site ./dist",
@@ -14,7 +15,7 @@
     "lint": "bunx --bun oxlint --type-aware --type-check . --fix",
     "format": "bunx oxfmt .",
     "test": "bun run test:unit",
-    "test:unit": "bun test src",
+    "test:unit": "bun test src scripts",
     "e2e:smoke": "bunx playwright test --grep @smoke",
     "e2e:critical": "bunx playwright test --grep @critical",
     "e2e:regression": "bunx playwright test --grep @regression",
