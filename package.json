@@ -16,9 +16,9 @@
     "format": "bunx oxfmt .",
     "test": "bun run test:unit",
     "test:unit": "bun test src scripts",
-    "e2e:smoke": "bunx playwright test --grep @smoke",
-    "e2e:critical": "bunx playwright test --grep @critical",
-    "e2e:regression": "bunx playwright test --grep @regression",
+    "e2e:smoke": "node scripts/run-playwright.mjs test --grep @smoke",
+    "e2e:critical": "node scripts/run-playwright.mjs test --grep @critical",
+    "e2e:regression": "node scripts/run-playwright.mjs test --grep @regression",
     "hyc": "hyc"
   },
   "dependencies": {

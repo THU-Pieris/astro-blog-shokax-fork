@@ -35,7 +35,9 @@
 
 ## 📦 安装
 
-本项目建议使用 [Bun](https://bun.sh/) 运行，不保证与 Nodejs 的兼容性
+本项目建议使用 [Bun](https://bun.sh/) 进行开发和构建，不保证站点运行时与 Node.js 的兼容性。
+端到端测试使用 Playwright，必须另外安装其官方支持的 Node.js 22、24 或 26；推荐 Node.js 24 LTS。
+刚安装 Node.js 后，请重新打开终端再运行 `bun run e2e:smoke`。
 
 你可以直接将本仓库 Clone 到本地（并为我们点一个 Star 😜），来开始使用。也可使用[由 Hyc 提供的交互式安装支持](https://docs.astro.kaitaku.xyz/start/guides/)
 
