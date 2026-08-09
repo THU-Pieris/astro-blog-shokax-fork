@@ -1,5 +1,7 @@
 import { expect, test } from "@playwright/test";
+import { waitForAstroIslandHydration } from "../support/hydration";
 import { POSTS, ROUTES, SEARCH_TERMS } from "../support/routes";
+import { openSearchDialog } from "../support/search";
 
 function escapeRegExp(input: string) {
   return input.replaceAll(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -25,6 +27,7 @@ async function waitForEnabled(locator: import("@playwright/test").Locator) {
 
 test("@regression 加密文章密码链路：错误提示、正确解密、刷新回到锁定态", async ({ page }) => {
   await page.goto(POSTS.encryptedTest);
+  await waitForAstroIslandHydration(page, "EncryptedPost");
 
   const passwordInput = page.getByPlaceholder("请输入密码");
   const submitButton = page.getByRole("button", { name: "解密" });
@@ -59,9 +62,7 @@ test("@regression 加密文章密码链路：错误提示、正确解密、刷�
 
 test("@critical 搜索命中后可点击结果跳转到对应文章", async ({ page }) => {
   await page.goto(ROUTES.home);
-  await page.getByRole("button", { name: "Search" }).click();
-
-  const searchDialog = page.getByRole("dialog", { name: "Search" });
+  const searchDialog = await openSearchDialog(page);
   const searchInput = page.locator("pagefind-input input");
   await expect(searchDialog).toBeVisible();
   await expect(searchInput).toBeVisible();
@@ -143,6 +144,7 @@ test("@critical 分页与标签/分类列表进入文章后回退，URL与列表
 test("@regression 主题切换后跨页面导航与刷新仍保持", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto(ROUTES.home);
+  await waitForAstroIslandHydration(page, "NavBar");
 
   await readTheme(page);
 

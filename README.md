@@ -35,7 +35,9 @@ Two-column layout:
 
 ## 📦 Installation
 
-We recommend using [Bun](https://bun.sh/) to run this project. Compatibility with Node.js is not guaranteed.
+We recommend using [Bun](https://bun.sh/) for development and builds. Compatibility of the site runtime with Node.js is not guaranteed.
+The Playwright end-to-end tests additionally require an officially supported Node.js 22, 24, or 26 release; Node.js 24 LTS is recommended.
+After installing Node.js, reopen the terminal before running `bun run e2e:smoke`.
 
 You can clone this repository directly to get started (and maybe drop us a Star 😜), or use the [interactive installation flow provided by HyC](https://docs.astro.kaitaku.xyz/start/guides/).
 

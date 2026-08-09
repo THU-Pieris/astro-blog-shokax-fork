@@ -19,7 +19,7 @@ test("@critical 首页分页导航可进入 /page/2/ 且当前页标识正确", 
   await expect(page.locator("nav.pagination [aria-current='page']")).toHaveText("2");
 });
 
-test("@critical /page/2/ 的分页 prev/next 链接保持正确路由", async ({ page }) => {
+test("@critical /page/2/ 末页仅保留返回首页的上一页链接", async ({ page }) => {
   const response = await page.goto(ROUTES.page2);
   expect(response?.ok()).toBeTruthy();
 
@@ -29,13 +29,9 @@ test("@critical /page/2/ 的分页 prev/next 链接保持正确路由", async ({
 
   const prevLink = pagination.locator("a[rel='prev']");
   await expect(prevLink).toHaveAttribute("href", ROUTES.home);
+  await expect(pagination.locator("a[rel='next']")).toHaveCount(0);
 
-  const nextLink = pagination.locator("a[rel='next']");
-  await expect(nextLink).toHaveAttribute("href", ROUTES.page3);
-
-  await nextLink.click();
-  await expect(page).toHaveURL(ROUTES.page3);
-  await expect(page.locator("nav.pagination [aria-current='page']")).toHaveText("3");
-
-  await expect(page.locator("nav.pagination a[rel='prev']")).toHaveAttribute("href", ROUTES.page2);
+  await prevLink.click();
+  await expect(page).toHaveURL(ROUTES.home);
+  await expect(page.locator("nav.pagination [aria-current='page']")).toHaveText("1");
 });
