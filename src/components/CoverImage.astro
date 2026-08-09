@@ -1,6 +1,7 @@
 ---
 import type { ImageMetadata } from "astro";
 import { Image } from "astro:assets";
+import ResilientImage from "./ResilientImage.astro";
 
 interface Props {
   src: ImageMetadata | string;
@@ -32,7 +33,7 @@ const assetSrc = !isStringSrc ? (src as ImageMetadata) : undefined;
       ontouchend="this.classList.remove('stop-animation')"
     >
       {imgSrc ? (
-        <img
+        <ResilientImage
           src={imgSrc}
           alt={alt}
           class="cover-image"
@@ -54,7 +55,7 @@ const assetSrc = !isStringSrc ? (src as ImageMetadata) : undefined;
       )}
     </li>
   ) : imgSrc ? (
-    <img
+    <ResilientImage
       src={imgSrc}
       alt={alt}
       class="single-image"
@@ -94,13 +95,13 @@ const assetSrc = !isStringSrc ? (src as ImageMetadata) : undefined;
     animation-play-state: paused;
   }
 
-  .cover-image {
+  .cover-item :global(.cover-image) {
     height: 100%;
     width: 100%;
     object-fit: cover;
   }
 
-  .single-image {
+  :global(#imgs .single-image) {
     height: 100%;
     width: 100%;
     left: 0;

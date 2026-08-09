@@ -37,7 +37,6 @@
     "@hyacine/helper": "^0.0.3",
     "@hyacine/mouse-firework": "^0.0.3",
     "@pagefind/component-ui": "^1.5.2",
-    "@playform/inline": "^0.1.4",
     "@unocss/astro": "^66.7.4",
     "@unocss/extractor-svelte": "^66.7.4",
     "@vtbag/element-crossing": "^1.1.0",

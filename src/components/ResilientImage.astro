@@ -1,0 +1,178 @@
+---
+import fallbackImage from "@/assets/images/cover-1.avif";
+
+interface Props {
+  src: string;
+  alt: string;
+  class?: string;
+  loading?: "eager" | "lazy";
+  decoding?: "sync" | "async" | "auto";
+  fetchpriority?: "high" | "low" | "auto";
+  fallbackSrc?: string;
+  maxRetries?: number;
+}
+
+const {
+  src,
+  alt,
+  class: className,
+  loading = "lazy",
+  decoding = "async",
+  fetchpriority = "auto",
+  fallbackSrc = fallbackImage.src,
+  maxRetries = 2,
+} = Astro.props as Props;
+---
+
+<shokax-resilient-image
+  data-original-src={src}
+  data-fallback-src={fallbackSrc}
+  data-max-retries={maxRetries}
+>
+  <img
+    src={src}
+    alt={alt}
+    class={className}
+    loading={loading}
+    decoding={decoding}
+    fetchpriority={fetchpriority}
+  />
+</shokax-resilient-image>
+
+<script>
+  import { buildRetryImageUrl } from "@/toolkit/images/retryImage";
+
+  const elementName = "shokax-resilient-image";
+
+  if (!customElements.get(elementName)) {
+    customElements.define(
+      elementName,
+      class extends HTMLElement {
+        private cleanup?: () => void;
+
+        connectedCallback() {
+          if (this.cleanup) return;
+
+          const image = this.querySelector("img");
+          const originalSrc = this.dataset.originalSrc;
+          if (!image || !originalSrc) return;
+
+          const fallbackSrc = this.dataset.fallbackSrc;
+          const parsedMaxRetries = Number.parseInt(this.dataset.maxRetries ?? "2", 10);
+          const maxRetries = Number.isFinite(parsedMaxRetries)
+            ? Math.max(0, parsedMaxRetries)
+            : 2;
+          const controller = new AbortController();
+          let retryCount = 0;
+          let retryTimer: number | undefined;
+          let usingFallback = false;
+          let stateVersion = 0;
+          let lastFailedSrc: string | undefined;
+
+          const clearRetryTimer = () => {
+            if (retryTimer === undefined) return;
+            window.clearTimeout(retryTimer);
+            retryTimer = undefined;
+          };
+
+          const setImageSource = (nextSrc: string) => {
+            image.removeAttribute("srcset");
+            image.src = nextSrc;
+          };
+
+          const reveal = (state: "loaded" | "fallback") => {
+            this.dataset.recoveryState = state;
+            image.classList.remove("resilient-image-recovering");
+          };
+
+          const handleLoad = () => {
+            stateVersion += 1;
+            clearRetryTimer();
+            lastFailedSrc = undefined;
+            reveal(usingFallback ? "fallback" : "loaded");
+          };
+
+          const handleError = () => {
+            if (image.complete && image.naturalWidth > 0) {
+              handleLoad();
+              return;
+            }
+
+            const failedSrc = image.currentSrc || image.src;
+            if (failedSrc && failedSrc === lastFailedSrc) return;
+
+            lastFailedSrc = failedSrc;
+            clearRetryTimer();
+            image.classList.add("resilient-image-recovering");
+
+            if (!usingFallback && retryCount < maxRetries) {
+              retryCount += 1;
+              this.dataset.recoveryState = "retrying";
+              const retryUrl = buildRetryImageUrl(
+                originalSrc,
+                document.baseURI,
+                retryCount,
+                Date.now().toString(36),
+              );
+
+              if (retryUrl !== failedSrc) {
+                const scheduledVersion = ++stateVersion;
+                retryTimer = window.setTimeout(() => {
+                  if (scheduledVersion !== stateVersion || usingFallback) return;
+                  retryTimer = undefined;
+                  setImageSource(retryUrl);
+                }, retryCount * 350);
+                return;
+              }
+
+              retryCount = maxRetries;
+            }
+
+            if (!usingFallback && fallbackSrc) {
+              usingFallback = true;
+              stateVersion += 1;
+              this.dataset.recoveryState = "loading-fallback";
+              setImageSource(fallbackSrc);
+              return;
+            }
+
+            stateVersion += 1;
+            this.dataset.recoveryState = "unavailable";
+          };
+
+          image.addEventListener("load", handleLoad, { signal: controller.signal });
+          image.addEventListener("error", handleError, { signal: controller.signal });
+
+          if (image.complete) {
+            if (image.naturalWidth > 0) {
+              handleLoad();
+            } else {
+              handleError();
+            }
+          }
+
+          this.cleanup = () => {
+            stateVersion += 1;
+            controller.abort();
+            clearRetryTimer();
+            this.cleanup = undefined;
+          };
+        }
+
+        disconnectedCallback() {
+          this.cleanup?.();
+        }
+      },
+    );
+  }
+</script>
+
+<style>
+  shokax-resilient-image {
+    display: contents;
+  }
+
+  :global(img.resilient-image-recovering) {
+    opacity: 0;
+  }
+</style>
