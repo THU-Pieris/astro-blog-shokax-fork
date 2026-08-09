@@ -11,6 +11,7 @@ export const ROUTES = {
 export const POSTS = {
   helloWorld: "/posts/hello-world/",
   gettingStarted: "/posts/getting-started/",
+  stickyExample: "/posts/sticky-example/",
   encryptedTest: "/posts/encrypted-test/",
   imageZoomTest: "/posts/image-zoom-test/",
   noteMdxDemo: "/posts/note-mdx-demo/",
