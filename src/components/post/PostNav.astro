@@ -1,8 +1,7 @@
 ---
 import { currentLocale, getT } from "@/i18n";
+import { buildPostFallbackCoverUrl } from "@/toolkit/posts/fallbackCover";
 import { generateRandomBrightColor } from "@/toolkit/tools/generateRandomBrightColor";
-import { covers } from "../Images.astro";
-import { sample } from "es-toolkit";
 
 interface NavPost {
   title: string;
@@ -15,10 +14,25 @@ interface Props {
   prevPost?: NavPost;
   nextPost?: NavPost;
   nextGradientCover?: boolean;
+  fallbackCoverUrl?: string;
 }
 
-const { prevPost, nextPost, nextGradientCover = false } = Astro.props;
+const {
+  prevPost,
+  nextPost,
+  nextGradientCover = false,
+  fallbackCoverUrl,
+} = Astro.props;
 const t = getT(currentLocale);
+
+function getPostNavBackground(post: NavPost): string | undefined {
+  if (nextGradientCover) {
+    return `background-image: linear-gradient(to bottom right, ${generateRandomBrightColor()}, ${generateRandomBrightColor()});`;
+  }
+
+  const cover = post.cover ?? buildPostFallbackCoverUrl(fallbackCoverUrl, post.slug);
+  return cover ? `background-image: url(${JSON.stringify(cover)});` : undefined;
+}
 ---
 
 <div class="post-nav">
@@ -30,11 +44,7 @@ const t = getT(currentLocale);
           itemprop="url"
           rel="prev"
           title={prevPost.title}
-          style={
-            nextGradientCover
-              ? `background-image: linear-gradient(to bottom right, ${generateRandomBrightColor()}, ${generateRandomBrightColor()});`
-              : `background-image: url(${prevPost.cover || sample(covers ?? []).src});`
-          }
+          style={getPostNavBackground(prevPost)}
         >
           <span class="type">{t("post.previousPost")}</span>
           {prevPost.category && (
@@ -57,11 +67,7 @@ const t = getT(currentLocale);
           itemprop="url"
           rel="next"
           title={nextPost.title}
-          style={
-            nextGradientCover
-              ? `background-image: linear-gradient(to bottom right, ${generateRandomBrightColor()}, ${generateRandomBrightColor()});`
-              : `background-image: url(${nextPost.cover || sample(covers ?? []).src});`
-          }
+          style={getPostNavBackground(nextPost)}
         >
           <span class="type">{t("post.nextPost")}</span>
           {nextPost.category && (

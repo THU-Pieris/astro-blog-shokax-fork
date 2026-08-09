@@ -95,7 +95,7 @@ interface CoverConfig {
   /**
    * 文章导航是否使用渐变背景。
    * - true：文章页底部的上一篇/下一篇导航使用随机渐变色背景
-   * - false：使用文章封面图
+   * - false：优先使用文章封面图，未配置时使用 postFallbackCover
    */
   nextGradientCover?: boolean;
 }

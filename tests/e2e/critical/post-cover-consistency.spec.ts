@@ -1,6 +1,16 @@
 import { expect, test } from "@playwright/test";
 import { POSTS } from "../support/routes";
 
+test.beforeEach(async ({ page }) => {
+  await page.route("https://pic.pieris05.com/**", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "image/svg+xml",
+      body: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="9" />',
+    });
+  });
+});
+
 function extractUrlFromBackgroundImage(style: string | null): string | null {
   if (!style) {
     return null;
@@ -49,4 +59,23 @@ test("@critical 文章内页下一页封面应与目标文章 cover 一致", asy
 
   expect(nextCoverUrl).not.toBeNull();
   expect(nextCoverUrl).toContain("cover-2");
+});
+
+test("@critical 文章内页上一篇未设置 cover 时应使用随机图片 API", async ({ page }) => {
+  const response = await page.goto(POSTS.helloWorld);
+  expect(response?.ok()).toBeTruthy();
+
+  const prevLink = page.locator(`.post-nav a[rel="prev"][href="${POSTS.stickyExample}"]`);
+  await expect(prevLink).toBeVisible();
+
+  const prevBackgroundImage = await prevLink.evaluate((element) => {
+    return window.getComputedStyle(element).backgroundImage;
+  });
+
+  const prevCoverUrl = extractUrlFromBackgroundImage(prevBackgroundImage);
+  expect(prevCoverUrl).not.toBeNull();
+
+  const parsedCoverUrl = new URL(prevCoverUrl!);
+  expect(parsedCoverUrl.origin + parsedCoverUrl.pathname).toBe("https://pic.pieris05.com/api");
+  expect(parsedCoverUrl.searchParams.get("post")).toBe("sticky-example");
 });
