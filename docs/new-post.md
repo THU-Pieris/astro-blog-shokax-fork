@@ -3,14 +3,14 @@
 日常写作时，在同级的私有 `astro-blog-content` 仓库根目录运行：
 
 ```sh
-bun run new "文章标题"
+pnpm run new "文章标题"
 ```
 
 新文章默认写入 `lang: zh-CN`。日文或英文文章可以在创建时指定语言：
 
 ```sh
-bun run new "日本語の記事" --lang ja
-bun run new "English post" --lang en
+pnpm run new "日本語の記事" --lang ja
+pnpm run new "English post" --lang en
 ```
 
 `--lang` 只接受 `zh-CN`、`ja` 和 `en`。也可以稍后直接修改文章 frontmatter：
@@ -74,7 +74,7 @@ Markdown 或 MDX 文件；遇到极小概率的 ID 冲突时会直接报错，�
 默认目录布局不适用时，可以只为本次命令指定路径：
 
 ```sh
-bun run new "文章标题" --posts-dir D:/path/to/private-content/site/src/posts
+pnpm run new "文章标题" --posts-dir D:/path/to/private-content/site/src/posts
 ```
 
 也可以通过 `BLOG_POSTS_DIR` 环境变量设置默认目录。不要把生成的文章复制或提交到

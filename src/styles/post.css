@@ -28,7 +28,7 @@
   font-size: 0.875em;
   line-height: 1.45;
   white-space: break-spaces;
-  word-break: break-word;
+  overflow-wrap: break-word;
   vertical-align: baseline;
 }
 
@@ -228,6 +228,15 @@
 #copyright li.noreprint .noreprint-text {
   color: var(--primary-color);
   font-weight: 700;
+}
+
+/* 超长 permalink（中文文件名 → percent 编码 URL）必须折行，否则撑破容器 */
+#copyright li.link a {
+  display: inline-block;
+  max-width: 100%;
+  vertical-align: bottom;
+  overflow-wrap: anywhere;
+  word-break: break-all;
 }
 
 #copyright li.noreprint .icon {

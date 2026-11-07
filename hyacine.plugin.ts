@@ -1,28 +1,26 @@
-import { defineConfig } from "@hyacine/core/config";
+import { defineConfig } from "@hyacine/plugin-core";
+import mouseFirework from "@hyacine/plugin-mouse-firework";
+import articleStatistics from "@hyacine/plugin-article-statistics";
 
-import MouseFirework from "@hyacine/mouse-firework";
-
+// 本 fork 只启用鼠标烟花与文章统计；评论、播放器、统计分析、AI、
+// 运行时间、标题切换、文章过期提示、访问计数均不启用。
 export default defineConfig({
   injectPoints: {
-    // 页面 head 部分，用于注入元标签、CSS 等
-    head: 'slot[name="head"]',
-    // 主布局容器
-    layout: "#container",
-    // 导航栏（navbar）
-    "right-nav": "#nav",
-    // 侧边栏
-    sidebar: "#sidebar",
-    // 页脚
-    footer: "#footer",
-    "footer-status": ".status",
-    // 页脚小部件区域
-    widgets: ".widgets",
-    // 文章页脚（版权、打赏等）
-    "post-footer": ".post footer",
+    "footer-status": {
+      selector: "#footer .status",
+      position: "append",
+    },
+    "post-header": {
+      selector: "article.post header",
+      position: "after",
+    },
+    "post-footer": {
+      selector: "article.post .body",
+      position: "after",
+    },
   },
-
   plugins: [
-    MouseFirework({
+    mouseFirework({
       colors: [
         "rgba(255,182,185,.9)",
         "rgba(250,227,217,.9)",
@@ -32,5 +30,6 @@ export default defineConfig({
       count: 30,
       radius: 16,
     }),
+    articleStatistics(),
   ],
 });

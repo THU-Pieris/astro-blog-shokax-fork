@@ -18,8 +18,8 @@ const lastCategory = post.data.categories?.at(-1);
 <article class="post-card">
   <div class="cover">
     {
-      post.data.cover && (
-        typeof post.data.cover === "string" ? (
+      post.data.cover &&
+        (typeof post.data.cover === "string" ? (
           <img
             src={post.data.cover}
             alt={post.data.title}
@@ -36,8 +36,7 @@ const lastCategory = post.data.categories?.at(-1);
             decoding="async"
             class="cover-image"
           />
-        )
-      )
+        ))
     }
     <div class="cover-overlay"></div>
   </div>
