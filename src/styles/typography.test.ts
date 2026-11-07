@@ -1,11 +1,11 @@
-import { describe, expect, it } from "bun:test";
+import { describe, expect, it } from "vitest";
 import { access, readFile } from "node:fs/promises";
 
 const typographyPath = new URL("./typography.css", import.meta.url);
 const layoutPath = new URL("../layouts/Layout.astro", import.meta.url);
 const brandPath = new URL("../components/Brand.astro", import.meta.url);
 const themeConfigPath = new URL("../theme.config.ts", import.meta.url);
-const searchPagePath = new URL("../components/search/SearchPage.svelte", import.meta.url);
+const searchPagePath = new URL("./search-page.css", import.meta.url);
 const hyacineConfigPath = new URL("../../hyacine.yml", import.meta.url);
 const legacyFontPath = new URL("../assets/fonts/LXGWWenKai-Regular.ttf", import.meta.url);
 

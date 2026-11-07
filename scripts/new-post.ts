@@ -2,6 +2,7 @@ import { randomBytes } from "node:crypto";
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
 import { isAbsolute, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   DEFAULT_POST_LANGUAGE,
   parsePostLanguage,
@@ -228,7 +229,11 @@ async function main(): Promise<void> {
   console.log(`已创建草稿：${postPath}`);
 }
 
-if (import.meta.main) {
+// 仅在作为入口脚本运行时执行（Node 下 import.meta.main 不一定可用）
+const isDirectRun =
+  process.argv[1] !== undefined && resolve(process.argv[1]) === fileURLToPath(import.meta.url);
+
+if (isDirectRun) {
   main().catch((error: unknown) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error(`创建文章失败：${message}`);

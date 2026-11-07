@@ -1,6 +1,5 @@
 ---
-import NavBar from "@/components/navbar/NavBar.svelte";
-import Analytics from "@/components/Analytics.astro";
+import NavBar from "@/components/navbar/NavBar";
 import Brand from "@/components/Brand.astro";
 import HeaderCover from "@/components/HeaderCover.astro";
 import Waves from "@/components/Waves.astro";
@@ -18,12 +17,22 @@ import themeConfig from "@/theme.config.ts";
 import "@/styles/palette.css";
 import "@/styles/typography.css";
 import "@/styles/style.css";
+import "@/styles/navbar.css";
+import "@/styles/sidebar.css";
+import "@/styles/widgets.css";
+import "@/styles/category-card.css";
+import "@/styles/floating-toolbar.css";
+import "@/styles/about-dialog.css";
+import "@/styles/search-page.css";
+import "@/styles/articles-charts.css";
+import "@/styles/image-zoom.css";
 import "@/styles/header-cover.css";
+import "@/styles/code-block-light.css";
 import "@/styles/mdx-components.css";
 
 import Loading from "@/components/Loading.astro";
 import { covers, resolveFixedCover } from "@/components/Images.astro";
-import FloatingToolbar from "@/components/FloatingToolbar.svelte";
+import FloatingToolbar from "@/components/FloatingToolbar";
 import TwoColumnLayout from "@/layouts/TwoColumnLayout.astro";
 import ThreeColumnLayout from "@/layouts/ThreeColumnLayout.astro";
 import { generateTagCloud } from "@/toolkit/posts/generateTagCloud";
@@ -73,11 +82,7 @@ const brandConfig = themeConfig.brand || {};
 const coverConfig = themeConfig.cover || {};
 const footerConfig = themeConfig.footer || {};
 const widgetsConfig = themeConfig.widgets || {};
-const commentsConfig = themeConfig.comments || {};
-const commentsEnabled = Boolean(themeConfig.comments?.enable);
-const walineConfig = commentsConfig.waline || {};
 const tagCloudConfig = themeConfig.tagCloud || {};
-const visibilityTitleConfig = themeConfig.visibilityTitle || {};
 const layoutConfig = themeConfig.layout || {};
 const rightSidebarConfig = layoutConfig.rightSidebar || {};
 const layoutMode = layoutConfig.mode || "two-column";
@@ -162,9 +167,10 @@ const siteState = {
 const widgetPosts = createWidgetPosts(posts);
 
 // Import custom elements definitions
-import CodeBlock from "@/components/CodeBlock.svelte";
-import ImageZoom from "@/components/ImageZoom.svelte";
-import SearchPage from "@/components/search/SearchPage.svelte";
+import CodeBlock from "@/components/CodeBlock";
+import ImageZoom from "@/components/ImageZoom";
+import SearchPage from "@/components/search/SearchPage";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
 ---
 
 <!doctype html>
@@ -176,7 +182,9 @@ import SearchPage from "@/components/search/SearchPage.svelte";
     <meta name="generator" content={Astro.generator} />
     <meta name="referrer" content="no-referrer" />
 
-    <Analytics />
+    <script>
+      import "virtual:hyacine/runtime";
+    </script>
 
     <slot name="head" />
 
@@ -184,10 +192,7 @@ import SearchPage from "@/components/search/SearchPage.svelte";
 
     <title>{pageTitle}</title>
   </head>
-  <body
-    data-visibility-title-config={JSON.stringify(visibilityTitleConfig)}
-    data-layout-mode={layoutMode}
-  >
+  <body data-layout-mode={layoutMode}>
     <NavBar
       client:load
       name={siteName}
@@ -220,8 +225,6 @@ import SearchPage from "@/components/search/SearchPage.svelte";
         <ActiveLayout
           widgetPosts={widgetPosts}
           widgetsConfig={widgetsConfig}
-          commentsEnabled={commentsEnabled}
-          walineServerURL={walineConfig.serverURL || ""}
           sidebarConfig={sidebarConfig}
           rightSidebarConfig={rightSidebarConfig}
           rightSidebarPosts={rightSidebarPosts}
@@ -242,89 +245,12 @@ import SearchPage from "@/components/search/SearchPage.svelte";
     <script>
       import "@/toolkit/initMdxComponents";
     </script>
-    <script>
-      type VisibilityTitleScriptConfig = {
-        enable: boolean;
-        leaveTitle: string;
-        returnTitle: string;
-        restoreDelay: number;
-      };
-
-      const parseVisibilityTitleConfig = () => {
-        const raw = document.body.dataset.visibilityTitleConfig;
-        if (!raw) {
-          return {} as Partial<VisibilityTitleScriptConfig>;
-        }
-
-        try {
-          const parsed = JSON.parse(raw) as unknown;
-          if (typeof parsed === "object" && parsed !== null) {
-            return parsed as Partial<VisibilityTitleScriptConfig>;
-          }
-        } catch {
-          // ignore malformed JSON and fallback to defaults
-        }
-
-        return {} as Partial<VisibilityTitleScriptConfig>;
-      };
-
-      const visibilityTitleConfigData = parseVisibilityTitleConfig();
-      const config = {
-        enable: visibilityTitleConfigData.enable ?? true,
-        leaveTitle:
-          visibilityTitleConfigData.leaveTitle ?? "(╥﹏╥) 不要走嘛...",
-        returnTitle:
-          visibilityTitleConfigData.returnTitle ?? "(๑•̀ㅂ•́)و✧ 欢迎回来！",
-        restoreDelay: visibilityTitleConfigData.restoreDelay ?? 3000,
-      };
-
-      if (config.enable) {
-        let originalTitle = document.title;
-        let restoreTimer: number | undefined;
-
-        const clearRestoreTimer = () => {
-          if (restoreTimer !== undefined) {
-            window.clearTimeout(restoreTimer);
-            restoreTimer = undefined;
-          }
-        };
-
-        const onVisibilityChange = () => {
-          clearRestoreTimer();
-
-          if (document.hidden) {
-            originalTitle = document.title;
-            document.title = config.leaveTitle;
-            const delay =
-              Number.isFinite(config.restoreDelay) && config.restoreDelay >= 0
-                ? config.restoreDelay
-                : 3000;
-
-            restoreTimer = window.setTimeout(() => {
-              document.title = originalTitle;
-            }, delay);
-            return;
-          }
-
-          document.title = config.returnTitle;
-          const delay =
-            Number.isFinite(config.restoreDelay) && config.restoreDelay >= 0
-              ? config.restoreDelay
-              : 3000;
-
-          restoreTimer = window.setTimeout(() => {
-            document.title = originalTitle;
-          }, delay);
-        };
-
-        document.addEventListener("visibilitychange", onVisibilityChange);
-      }
-    </script>
     <div class="hidden">
       <CodeBlock client:idle />
       <ImageZoom client:idle />
     </div>
-    <FloatingToolbar client:idle nyxPlayer={themeConfig.nyxPlayer} />
+    <FloatingToolbar client:idle hasNyxPlayer={true} />
+    <HyacineOutlet name="layout-bottom" />
   </body>
 </html>
 

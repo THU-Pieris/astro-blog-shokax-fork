@@ -2,10 +2,11 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "jsx": "preserve",
+    "jsxImportSource": "solid-js",
     "paths": {
       "@/*": ["./src/*"]
     },
-    "types": ["vite-plugin-font/src/font", "@types/bun"],
+    "types": ["vite-plugin-font/src/font"],
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
     "plugins": [
@@ -14,6 +15,6 @@
       }
     ]
   },
-  "include": [".astro/types.d.ts", "**/*"],
+  "include": [".astro/types.d.ts", "src/**/*", "*.config.ts"],
   "exclude": ["dist"]
 }

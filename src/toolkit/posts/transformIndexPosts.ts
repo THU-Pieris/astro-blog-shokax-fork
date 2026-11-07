@@ -1,7 +1,8 @@
 import type { ImageMetadata } from "astro";
 import type { CollectionEntry } from "astro:content";
 import { countWords } from "./calculateStats";
-import { toCategoryHref, toPostHref } from "./url";
+import { resolveExcerpt } from "./excerpt";
+import { toPostProjection } from "./projection";
 import { resolveDescriptionLanguage, type PostLanguage } from "./postLanguage";
 
 const DEFAULT_EXCERPT_LENGTH = 300;
@@ -65,24 +66,11 @@ export function getExcerpt(
   excerptLength: number = DEFAULT_EXCERPT_LENGTH,
   aiSummary?: string,
 ): string {
-  if (post.data.encrypted) {
-    return encryptedExcerpt;
-  }
-
-  const trimmedAiSummary = typeof aiSummary === "string" ? aiSummary.trim() : "";
-  if (trimmedAiSummary) {
-    return trimmedAiSummary;
-  }
-
-  if (post.data.description) {
-    return post.data.description;
-  }
-
-  if (post.body) {
-    return post.body.slice(0, excerptLength);
-  }
-
-  return "";
+  return resolveExcerpt(post, {
+    encryptedExcerpt,
+    length: excerptLength,
+    aiSummary,
+  });
 }
 
 export function transformIndexPosts(
@@ -103,22 +91,23 @@ export function transformIndexPosts(
   return postList.map((post) => {
     const wordCount = countWords(post.body || "");
     const readTime = calculateReadTime(wordCount, wordsPerMinute);
-    const lastCategory = post.data.categories?.at(-1);
-    const aiSummary = useAiExcerpt ? aiSummaries?.get(post.id) : undefined;
+    // oxlint-disable-next-line typescript/no-unsafe-type-assertion, typescript/no-explicit-any -- 允许动态提取 AI 摘要
+    const postDataAny = post.data as Record<string, any>;
+    const aiSummary = useAiExcerpt
+      ? (aiSummaries?.get(post.id) ??
+        post.data.ai?.summary?.summary ??
+        postDataAny.ai_summary ??
+        postDataAny.summary)
+      : undefined;
 
     return {
-      slug: post.id,
-      title: post.data.title,
+      ...toPostProjection(post),
       lang: post.data.lang,
-      url: toPostHref(post.id),
-      date: post.data.date,
       excerpt: getExcerpt(post, encryptedExcerpt, excerptLength, aiSummary),
       excerptLang: post.data.encrypted
         ? undefined
         : resolveDescriptionLanguage(post.data.lang, post.data.descriptionLang),
       cover: resolveCover?.(post),
-      category: lastCategory,
-      categoryUrl: lastCategory ? toCategoryHref(lastCategory) : undefined,
       wordCount,
       readTime,
     };

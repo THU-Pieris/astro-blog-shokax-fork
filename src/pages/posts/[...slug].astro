@@ -3,10 +3,8 @@ import Layout from "@/layouts/Layout.astro";
 import Breadcrumb from "@/components/post/Breadcrumb.astro";
 import PostHeader from "@/components/post/PostHeader.astro";
 import PostFooter from "@/components/post/PostFooter.astro";
+import HyacineOutlet from "@hyacine/plugin-astro/components/HyacineOutlet.astro";
 import PostNav from "@/components/post/PostNav.astro";
-import AiSimilarPosts from "@/components/post/AiSimilarPosts.astro";
-import AiSummaryCard from "@/components/post/AiSummaryCard.astro";
-import WalineComments from "@/components/post/WalineComments.svelte";
 import { currentLocale } from "@/i18n";
 import { getCollection, render } from "astro:content";
 import themeConfig from "@/theme.config";
@@ -15,6 +13,7 @@ import type {
   QuickNavigation,
 } from "@/components/sidebar/SidebarTypes";
 import type { EncryptedData } from "@/toolkit/encryption/types";
+import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 import { encryptContent } from "@/toolkit/encryption/crypto";
 import { createPostContentContainer } from "@/toolkit/posts/createPostContentContainer";
 import { toPostHref, toTagHref } from "@/toolkit/posts/url";
@@ -22,7 +21,6 @@ import { wrapRenderedCodeBlocks } from "@/toolkit/wrapRenderedCodeBlocks";
 import { wrapRenderedImages } from "@/toolkit/wrapRenderedImages";
 import { wrapCodeGroups } from "@/toolkit/wrapCodeGroups";
 import { wrapExternalLinks } from "@/toolkit/wrapExternalLinks";
-import type { PostLanguage } from "@/toolkit/posts/postLanguage";
 
 import "@/styles/post.css";
 
@@ -32,18 +30,13 @@ import { avatar } from "@/components/Images.astro";
 import "@/styles/spoiler.css";
 
 // 加密文章内容组件
-import EncryptedPostContent from "@/components/encrypted/EncryptedPost.svelte";
+import EncryptedPostContent from "@/components/encrypted/EncryptedPost";
 
 export async function getStaticPaths() {
   const posts = await getCollection("posts");
   const sortedPosts = posts
     .filter((post) => !post.data.draft)
     .toSorted((a, b) => b.data.date.getTime() - a.data.date.getTime());
-  const postLanguageBySlug = Object.fromEntries(
-    sortedPosts.flatMap((post) =>
-      post.data.lang ? [[post.id, post.data.lang]] : [],
-    ),
-  ) as Partial<Record<string, PostLanguage>>;
 
   const container = await createPostContentContainer();
 
@@ -144,7 +137,6 @@ export async function getStaticPaths() {
               }
             : undefined,
           relatedPosts,
-          postLanguageBySlug,
           isEncrypted,
           renderedContentHtml,
           encryptedContent,
@@ -179,7 +171,6 @@ interface Props {
     date: Date;
     category?: string;
   }[];
-  postLanguageBySlug: Partial<Record<string, PostLanguage>>;
   isEncrypted: boolean;
   renderedContentHtml?: string;
   encryptedContent?: EncryptedData;
@@ -192,7 +183,6 @@ const {
   prevPost,
   nextPost,
   relatedPosts,
-  postLanguageBySlug,
   isEncrypted,
   renderedContentHtml,
   encryptedContent,
@@ -232,103 +222,6 @@ const readTime = Math.ceil(wordCount / 300);
 const siteConfig = themeConfig.sidebar || {};
 const author = siteConfig.author || "Author";
 const siteName = themeConfig.siteName || "Site";
-const commentsConfig = themeConfig.comments || {};
-const walineConfig = commentsConfig.waline || {};
-
-const hycConfig = themeConfig.hyc || {};
-const aiRecommendConfig = hycConfig.aiRecommend || {};
-const aiSummaryConfig = hycConfig.aiSummary || {};
-const hycEnable = hycConfig.enable === true;
-const aiRecommendEnable = aiRecommendConfig.enable !== false;
-const aiSummaryEnable = aiSummaryConfig.enable !== false;
-const aiSummaryTitle = aiSummaryConfig.title || "AI 摘要";
-const aiSummaryShowModel = aiSummaryConfig.showModel === true;
-const aiRecommendLimit = Math.max(
-  1,
-  Math.min(10, aiRecommendConfig.limit ?? 3),
-);
-const aiRecommendMinSimilarityRaw = aiRecommendConfig.minSimilarity ?? 0.4;
-const aiRecommendMinSimilarity = Math.min(
-  1,
-  Math.max(
-    0,
-    aiRecommendMinSimilarityRaw > 1
-      ? aiRecommendMinSimilarityRaw / 100
-      : aiRecommendMinSimilarityRaw,
-  ),
-);
-
-interface AiRecommendPost {
-  slug: string;
-  title: string;
-  lang?: PostLanguage;
-  score: number;
-}
-
-interface PostAiSummary {
-  content: string | null;
-  model: string | null;
-}
-
-let aiRecommendPosts: AiRecommendPost[] = [];
-let aiSummary: PostAiSummary | null = null;
-
-// 加密文章不获取 AI 摘要和推荐
-if (!isEncrypted && hycEnable && aiSummaryEnable) {
-  try {
-    const { getPostSummary } = await import("@hyacine/cli/api");
-
-    if (typeof getPostSummary !== "function") {
-      throw new TypeError(
-        "getPostSummary is not available in current @hyacine/cli",
-      );
-    }
-
-    const summaryResult = (await getPostSummary(post.id)) as {
-      summary?: {
-        content?: string | null;
-        model?: string | null;
-      };
-    } | null;
-
-    if (summaryResult?.summary?.content) {
-      aiSummary = {
-        content: summaryResult.summary.content,
-        model: summaryResult.summary.model ?? null,
-      };
-    }
-  } catch {
-    aiSummary = null;
-  }
-}
-
-if (!isEncrypted && hycEnable && aiRecommendEnable) {
-  try {
-    const { findSimilarPosts } = await import("@hyacine/cli/api");
-    const similarResult = await findSimilarPosts({
-      query: post.id,
-      limit: aiRecommendLimit,
-    });
-
-    aiRecommendPosts = (similarResult.items || [])
-      .filter((item) => item.slug && item.slug !== post.id)
-      .filter(
-        (item) =>
-          typeof item.score === "number" &&
-          item.score >= aiRecommendMinSimilarity,
-      )
-      .toSorted((a, b) => b.score - a.score)
-      .slice(0, aiRecommendLimit)
-      .map((item) => ({
-        slug: item.slug,
-        title: item.title,
-        lang: postLanguageBySlug[item.slug],
-        score: item.score,
-      }));
-  } catch {
-    aiRecommendPosts = [];
-  }
-}
 
 // Current post path (trailing slash required by project routing)
 const postPath = toPostHref(post.id);
@@ -409,16 +302,15 @@ const postMeta = {
           wordCount={wordCount}
         />
 
-        {
-          !isEncrypted && (
-            <AiSummaryCard
-              summary={aiSummary?.content}
-              model={aiSummary?.model}
-              title={aiSummaryTitle}
-              showModel={aiSummaryShowModel}
-            />
-          )
-        }
+        {/* Hyacine Plugin Outlet: Post Header */}
+        <HyacineOutlet name="post-header" context={post} />
+
+        {/* Hyacine Plugin Outlet: AI 摘要（encrypted 时插件内部自动短路） */}
+        <HyacineOutlet
+          name="post-summary"
+          context={post}
+          extraProps={{ postId: post.id, postBody: post.body }}
+        />
 
         <div class="body md" itemprop="articleBody">
           {
@@ -448,15 +340,6 @@ const postMeta = {
           }
         </div>
 
-        {
-          !isEncrypted && (
-            <AiSimilarPosts
-              posts={aiRecommendPosts}
-              minSimilarity={aiRecommendMinSimilarity}
-            />
-          )
-        }
-
         <PostFooter
           date={post.data.date}
           updated={post.data.updated}
@@ -467,6 +350,13 @@ const postMeta = {
           showCopyright={true}
           showReward={false}
           license={post.data.license}
+        />
+
+        {/* Hyacine Plugin Outlet: Post Footer */}
+        <HyacineOutlet
+          name="post-footer"
+          context={post}
+          extraProps={{ postId: post.id }}
         />
       </article>
     </div>
@@ -479,16 +369,10 @@ const postMeta = {
     />
 
     {
-      !isEncrypted && commentsConfig.enable !== false && (
+      !isEncrypted && (
         <div id="comments" class="comment">
-          <WalineComments
-            client:visible
-            serverURL={walineConfig.serverURL}
-            lang={walineConfig.lang || currentLocale}
-            dark={walineConfig.dark}
-            path={walineConfig.path}
-            pagePath={postPath}
-          />
+          {/* Hyacine Plugin Outlet: Waline 评论 */}
+          <HyacineOutlet name="comment" />
         </div>
       )
     }

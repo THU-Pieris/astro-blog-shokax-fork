@@ -1,7 +1,11 @@
-import { defineConfig, presetAttributify, presetIcons, presetWind4 } from "unocss";
+import {
+  defineConfig,
+  presetAttributify,
+  presetIcons,
+  presetWind4,
+  transformerDirectives,
+} from "unocss";
 import themeConfig from "./src/theme.config";
-import extractorSvelte from "@unocss/extractor-svelte";
-import { transformerDirectives } from "unocss";
 
 function normalizeIconName(icon: string): string {
   return icon.startsWith("i-") ? icon : `i-ri-${icon}`;
@@ -58,7 +62,6 @@ const iconSafeList = [
 
 export default defineConfig({
   presets: [presetWind4(), presetIcons(), presetAttributify()],
-  extractors: [extractorSvelte()],
   transformers: [transformerDirectives()],
   theme: {
     colors: {

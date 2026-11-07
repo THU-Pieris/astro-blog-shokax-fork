@@ -1,6 +1,7 @@
 // cannot use path alias here because unocss can not resolve it
 import { defineConfig } from "./toolkit/themeConfig";
 
+// 评论、音乐播放器、标题切换、AI 等功能自 2.0 起由 hyacine.plugin.ts 中是否注册对应插件决定
 export default defineConfig({
   siteName: "アセビ。",
   locale: "zh-CN",
@@ -115,19 +116,6 @@ export default defineConfig({
     recentCommentsLimit: 0,
   },
 
-  comments: {
-    enable: false,
-    waline: {
-      serverURL: "",
-      lang: "zh-CN",
-    },
-  },
-
-  nyxPlayer: {
-    enable: false,
-    urls: [],
-  },
-
   home: {
     selectedCategories: [
       {
@@ -177,14 +165,6 @@ export default defineConfig({
   tagCloud: {
     startColor: "#72cecf",
     endColor: "#ffbac3",
-  },
-
-  visibilityTitle: {
-    enable: false,
-  },
-
-  hyc: {
-    enable: false,
   },
 
   copyright: {
